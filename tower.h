@@ -14,8 +14,10 @@ class Tower
         double beamHeight;
         void drawLowerBase();
         void drawUpperBase();
-        double calcCurvPoints();
+        void drawSingleBeam();
         void drawMajorBeams();
+        void drawUpperConeHalf();
+        void drawUpperCone();
 
     public:
         Tower();
@@ -36,9 +38,8 @@ void Tower :: drawTower()
     drawLowerBase();
     drawUpperBase();
     drawMajorBeams();
+    drawUpperCone();
 }
-
-
 
 void Tower :: drawLowerBase()
 {
@@ -164,7 +165,6 @@ void Tower :: drawUpperBase()
         }
         glEnd();
     }
-    //glColor3f(0,1.0,0);
 /// curved wall building
     shapes.drawCurvedWall(24.139,-atan(21.136/11.660),-2*atan(11.660/21.136),8,upperBaseHeight);
 /// side walls built ////////////////////////////////
@@ -225,13 +225,12 @@ void Tower :: drawUpperBase()
         {x[6],y[6]}
     };
     shapes.drawPolygon(4,pnts5);
-
     shapes.drawCurvedRoof(24.138,-atan(21.136/11.660),-2*atan(11.660/21.136),8);
-
 
 /// roof building stops here ///////////////////////////
 }
-void Tower :: drawMajorBeams()
+
+void Tower :: drawSingleBeam()
 {
     double pnts[][2]={
         {2.62,0}
@@ -239,16 +238,17 @@ void Tower :: drawMajorBeams()
         ,{0,2.9}
         };
     double hexgnSide = (pnts[1][0]-pnts[0][0])/2.0;
+    double tilt=2.1;
     glPushMatrix();
     {
-        //printf("hex %lf\n",hexgnSide*cos(PI*60.0/180.0));
-        glRotatef(-1.2,0,1,0);
+        glRotatef(-tilt,0,1,0);
         glTranslatef(pnts[0][0]+hexgnSide,0,0.1);
         glColor3f(0,0.2,0);
 
-        for(int i=0;i<6;i++)
+        glRotatef(180,0,0,1);
+        for(int i=0;i<4;i++)
         {
-            glColor3f(0,0.1*i,0);
+            glColor3f(0.15*i,0.15*i,0.15*i);
             glRotatef(60,0,0,1);
             glBegin(GL_QUADS);
             {
@@ -259,30 +259,130 @@ void Tower :: drawMajorBeams()
             }
             glEnd();
         }
+/// inner blank portion start here ///////////////////////////////////
+
+        for(int i=0;i<2;i++)
+        {
+            glColor3f(0.15*i,0.15*i,0.15*i);
+            glRotatef(60,0,0,1);
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(hexgnSide,0,0);
+                glVertex3f(hexgnSide,0,beamHeight);
+                glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,beamHeight);
+                glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,0);
+            }
+            glEnd();
+        }
+        glPushMatrix();
+        {
+            glColor3f(0,1.0,0);
+            glTranslatef(3.6,0,0);
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(0,.23,63.743);
+                glVertex3f(.32,.23,63.743);
+                glVertex3f(.32,-.23,63.743);
+                glVertex3f(0,-.23,63.743);
+            }
+            glEnd();
+        }
+        glPopMatrix();
+
+/// inner blank ends //////////////////////////////////////////////////
+        glTranslatef(0,0,beamHeight-.5);
+        glPushMatrix();
+        {
+            glRotatef(5,0,1,0);
+            glRotatef(60,0,0,1);
+            for(int i=0;i<2;i++)
+            {
+                glColor3f(0.3*i,0.3*i,0.3*i);
+                glRotatef(60,0,0,1);
+                glBegin(GL_QUADS);
+                {
+                    glVertex3f(hexgnSide,0,22.097);
+                    glVertex3f(hexgnSide,0,0);
+                    glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,0);
+                    glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,22.097);
+                }
+                glEnd();
+            }
+        }
+        glPopMatrix();
     }
     glPopMatrix();
+
+}
+
+void Tower :: drawMajorBeams()
+{
+    glPushMatrix();
+    {
+        drawSingleBeam();
+        glRotatef(180,0,0,1);
+        drawSingleBeam();
+    }
+    glPopMatrix();
+}
+
+void Tower :: drawUpperConeHalf()
+{
+    double pnts1[4][2];
+    pnts1[0][0]=2.8;
+    pnts1[0][1]=0;
+    pnts1[1][0]=(pnts1[0][0]+.428)*cos(PI*67.0/180.0);
+    pnts1[1][1]=(pnts1[0][0]+.428)*sin(PI*60.0/180.0);
+    pnts1[2][0]=-pnts1[1][0];
+    pnts1[2][1]=pnts1[1][1];
+    pnts1[3][0]=-pnts1[0][0];
+    pnts1[3][1]=0;
+
+    double pnts2[4][2];
+    pnts2[0][0]=.09;
+    pnts2[0][1]=0;
+    pnts2[1][0]=(pnts2[0][0])*cos(PI*60.0/180.0);
+    pnts2[1][1]=(pnts2[0][0])*sin(PI*60.0/180.0);
+    pnts2[2][0]=-pnts2[1][0];
+    pnts2[2][1]=pnts2[1][1];
+    pnts2[3][0]=-pnts2[0][0];
+    pnts2[3][1]=0;
+
+    double coneHeight=38.0;
 
     glPushMatrix();
     {
-        glRotatef(180,0,0,1);
-        glRotatef(-1.2,0,1,0);
-        glTranslatef(pnts[0][0]+hexgnSide,0,0.1);
-        for(int i=0;i<6;i++)
+        glTranslatef(0,0,121.95);
+        glColor3f(0.5,0.5,0.5);
+
+        for(int i=0;i<3;i++)
         {
-            glColor3f(0,0,0.1*i);
-            glRotatef(60,0,0,1);
+            glColor3f(i*0.2,i*0.2,i*0.2);
             glBegin(GL_QUADS);
             {
-                glVertex3f(hexgnSide,0,0);
-                glVertex3f(hexgnSide,0,beamHeight);
-                glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,beamHeight);
-                glVertex3f(hexgnSide * 0.5 ,hexgnSide * 0.866 ,0);
+                glVertex3f(pnts2[i][0],pnts2[i][1],coneHeight);
+                glVertex3f(pnts1[i][0],pnts1[i][1],0);
+                glVertex3f(pnts1[i+1][0],pnts1[i+1][1],0);
+                glVertex3f(pnts2[i+1][0],pnts2[i+1][1],coneHeight);
             }
             glEnd();
         }
+
+        glTranslatef(0,0,38);
+        glColor3f(0,1.0,0);
+        shapes.drawPolygon(4,pnts2);
     }
     glPopMatrix();
-
+}
+void Tower :: drawUpperCone()
+{
+    glPushMatrix();
+    {
+        drawUpperConeHalf();
+        glRotatef(180,0,0,1);
+        drawUpperConeHalf();
+    }
+    glPopMatrix();
 }
 #endif // TOWER_H
 

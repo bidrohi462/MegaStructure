@@ -121,7 +121,7 @@ void Shapes :: drawHalfCylinder(float radius,float len)
 		}
 
 	}
-	double color=0.5;
+	//double color=0.5;
 	for(i=0;i<stacks;i++)
 	{
 	    for(j=0;j<slices;j++)

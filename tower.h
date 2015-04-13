@@ -1,7 +1,10 @@
 #ifndef TOWER_H
 #define TOWER_H
 
+
+#include <cmath>
 #include "primitives.h"
+
 class Tower
 {
     private:
@@ -12,13 +15,12 @@ class Tower
         double beamHeight;
         void drawLowerBase();
         void drawUpperBase();
+        double calcCurvPoints();
         void drawMajorBeams();
-        void drawWalls(int totalPoint,double p[][2],double height);
-        void drawPolygon(int totalPoint,double p[][2]);
+
     public:
         Tower();
         void drawTower();
-
 };
 
 Tower :: Tower()
@@ -37,30 +39,7 @@ void Tower :: drawTower()
     drawMajorBeams();
 }
 
-void Tower :: drawWalls(int totalPoint,double p[][2],double height)
-{
-    for(int i=0;i<totalPoint-1;i++)
-    {
-        glBegin(GL_QUADS);
-        {
-            glVertex3f(p[i][0],p[i][1],0);
-            glVertex3f(p[i][0],p[i][1],height);
-            glVertex3f(p[i+1][0],p[i+1][1],height);
-            glVertex3f(p[i+1][0],p[i+1][1],0);
-        }
-        glEnd();
-    }
 
-}
-void Tower :: drawPolygon(int totalPoint,double p[][2])
-{
-    glBegin(GL_POLYGON);
-    for(int i=0;i<totalPoint;i++)
-    {
-        glVertex2f(p[i][0],p[i][1]);
-    }
-    glEnd();
-}
 
 void Tower :: drawLowerBase()
 {
@@ -75,16 +54,16 @@ void Tower :: drawLowerBase()
             ,{lowerBaseRadius-7,-13.250}
             ,{lowerBaseRadius-4.456,0}
         };
-        drawWalls(3,pnts1,lowerBaseHeight);
+        shapes.drawWalls(3,pnts1,lowerBaseHeight);
 
-        double pnts5[][2]={
+        double pnts2[][2]={
             {-lowerBaseRadius,0}
             ,{-lowerBaseRadius,-6.269}//
             ,{-lowerBaseRadius-4.790,-8}
             ,{-lowerBaseRadius-11.6,-7.411}
             ,{-lowerBaseRadius-10.842,-12.06},
         };
-        drawWalls(5,pnts5,lowerBaseHeight);
+        shapes.drawWalls(5,pnts2,lowerBaseHeight);
 
 
 /// lower layer roof starts here /////////////////////////////////////////
@@ -97,30 +76,30 @@ void Tower :: drawLowerBase()
         shapes.drawHalfCircle(lowerBaseRadius);
 /// lower layer irregular shapes //////////////////////////////////////////
 
-        drawPolygon(5,pnts1);
+        shapes.drawPolygon(5,pnts1);
 
-        double pnts2[][2]={
+        double pnts3[][2]={
             {-lowerBaseRadius+4.456,0},
             {-lowerBaseRadius,0},
             {-lowerBaseRadius,-6.269},
             {-lowerBaseRadius+4.456,-10.871}
         };
-        drawPolygon(4,pnts2);
+        shapes.drawPolygon(4,pnts3);
 
-        double pnts3[][2]={
+        double pnts4[][2]={
             {-lowerBaseRadius,-6.269},
             {-lowerBaseRadius+4.456,-10.871},
             {-lowerBaseRadius-10.842,-12.06},
             {-lowerBaseRadius-4.790,-8}
         };
-        drawPolygon(4,pnts3);
+        shapes.drawPolygon(4,pnts4);
 
-        double pnts4[][2]={
+        double pnts5[][2]={
             {-lowerBaseRadius-10.842,-12.06},
             {-lowerBaseRadius-4.790,-8},
             {-lowerBaseRadius-11.6,-7.411}
         };
-        drawPolygon(3,pnts4);
+        shapes.drawPolygon(3,pnts5);
 
 
 /// translation for upper layer
@@ -131,16 +110,13 @@ void Tower :: drawLowerBase()
 
 /// drawing irregular shaped portion in upper layer
         //glColor3f(0,0,1.0);
-        glBegin(GL_POLYGON);
-        {
-            glVertex2f(lowerBaseRadius-4.456,0);
-            glVertex2f(-lowerBaseRadius+4.456,0);
-            glVertex2f(-lowerBaseRadius+4.456,-9.804);
-            glVertex2f(0,-33.411);
-        }
-        glEnd();
-
-
+        double pnts6[][2]={
+            {lowerBaseRadius-4.456,0}
+            ,{-lowerBaseRadius+4.456,0}
+            ,{-lowerBaseRadius+4.456,-9.804}
+            ,{0,-33.411}
+        };
+        shapes.drawPolygon(4,pnts6);
 
     }glPopMatrix();
 
@@ -158,7 +134,7 @@ void Tower :: drawUpperBase()
     double y[]={14.0,0,-2.623,-10.461,
                 -12.385,-10.927,-11.589,-21.136,-24.890};
 
-/// building side walls
+/// building side walls //////////////////////////////////////////
     glBegin(GL_QUADS);
     {
         glVertex3f(x[0],y[0],0);
@@ -167,7 +143,7 @@ void Tower :: drawUpperBase()
         glVertex3f(-x[0],y[0],0);
     }
     glEnd();
-    for(int i=0;i<8;i++)
+    for(int i=0;i<7;i++)
     {
         glBegin(GL_QUADS);
         {
@@ -178,7 +154,7 @@ void Tower :: drawUpperBase()
         }
         glEnd();
     }
-    for(int i=0;i<8;i++)
+    for(int i=1;i<8;i++)
     {
         glBegin(GL_QUADS);
         {
@@ -195,21 +171,55 @@ void Tower :: drawUpperBase()
 
     glTranslatef(0,0,upperBaseHeight);
     glColor3f(1.0,0,0);
-    glBegin(GL_LINE_LOOP);
+
+    double pnts1[][2]={
+
+        {-x[0],y[0]},
+        {-x[1],y[1]},
+        {-x[2],y[2]},
+        {x[2],y[2]},
+        {x[1],y[1]},
+        {x[0],y[0]}
+    };
+    shapes.drawPolygon(6,pnts1);
+
+    double pnts2[][2]={
+        {-x[2],y[2]},
+        {-x[5],y[5]},
+        {x[5],y[5]},
+        {x[2],y[2]}
+    };
+    shapes.drawPolygon(4,pnts2);
+
+    double pnts3[][2]={
+        {-x[2],y[2]},
+        {-x[3],y[3]},
+        {-x[4],y[4]},
+        {-x[5],y[5]},
+        {x[5],y[5]},
+        {x[4],y[4]},
+        {x[3],y[3]},
+        {x[2],y[2]}
+    };
+    shapes.drawPolygon(4,pnts3);
+    glPushMatrix();
     {
-        for(int i=0;i<9;i++)
-        {
-            glVertex2f(x[i],y[i]);
-        }
-        for(int i=1;i<9;i++)//skip repeated last point
-        {
-            glVertex2f(-x[8-i],y[8-i]);
-        }
+        glRotatef(180,0,1,0);
+        shapes.drawPolygon(4,pnts3);
     }
-    glEnd();
+    glPopMatrix();
+    double pnts4[][2]={
+        {-x[6],y[6]},
+        {-x[5],y[5]},
+        {x[5],y[5]},
+        {x[6],y[6]}
+    };
+    shapes.drawPolygon(4,pnts4);
+
+    shapes.drawArc(24.138,-atan(21.136/11.660),-2*atan(11.660/21.136),8);
+
 /// roof building stops here ///////////////////////////
 }
-
 void Tower :: drawMajorBeams()
 {
     for(int i=1;i<6;i++)

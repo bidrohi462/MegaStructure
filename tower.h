@@ -1,7 +1,6 @@
 #ifndef TOWER_H
 #define TOWER_H
 
-
 #include <cmath>
 #include "primitives.h"
 
@@ -165,6 +164,9 @@ void Tower :: drawUpperBase()
         }
         glEnd();
     }
+    //glColor3f(0,1.0,0);
+/// curved wall building
+    shapes.drawCurvedWall(24.139,-atan(21.136/11.660),-2*atan(11.660/21.136),8,upperBaseHeight);
 /// side walls built ////////////////////////////////
 
 /// roof building starts here //////////////////////////
@@ -216,7 +218,17 @@ void Tower :: drawUpperBase()
     };
     shapes.drawPolygon(4,pnts4);
 
-    shapes.drawArc(24.138,-atan(21.136/11.660),-2*atan(11.660/21.136),8);
+    double pnts5[][2]={
+        {-x[6],y[6]},
+        {-x[7],y[7]},
+        {x[7],y[7]},
+        {x[6],y[6]}
+    };
+    shapes.drawPolygon(4,pnts5);
+
+
+    shapes.drawCurvedRoof(24.138,-atan(21.136/11.660),-2*atan(11.660/21.136),8);
+
 
 /// roof building stops here ///////////////////////////
 }

@@ -21,6 +21,7 @@ class Shapes
         void drawPolygon(int totalPoint,double p[][2]);
         void drawArc(float r, float start_angle, float arc_angle, int num_segments);
         void drawCurvedWall(float r, float start_angle, float arc_angle, int num_segments,double height);
+        void drawCurvedRoof(float r, float start_angle, float arc_angle, int num_segments);
 };
 
 void Shapes :: drawsphere(float radius)
@@ -252,9 +253,55 @@ void Shapes :: drawCurvedWall(float r, float start_angle, float arc_angle, int n
 	float x = r * cosf(start_angle);//we now start at the start angle
 	float y = r * sinf(start_angle);
 
-	glBegin(GL_LINE_STRIP);//since the arc is not a closed curve, this is a strip now
-	for(int ii = 0; ii < num_segments; ii++)
+	float prevx,prevy;
+
+	for(int i = 0; i < num_segments-1; i++)
 	{
+	    prevx=x;
+	    prevy=y;
+		glVertex2f(x + cx, y + cy);
+
+		float tx = -y;
+		float ty = x;
+
+		x += tx * tangetial_factor;
+		y += ty * tangetial_factor;
+
+		x *= radial_factor;
+		y *= radial_factor;
+
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevx,prevy,0);
+            glVertex3f(prevx,prevy,height);
+            glVertex3f(x,y,height);
+            glVertex3f(x,y,0);
+		}
+		glEnd();
+	}
+}
+void Shapes :: drawCurvedRoof(float r, float start_angle, float arc_angle, int num_segments)
+{
+    float cx=0, cy=0;
+
+    //arc_angle = PI * arc_angle / 180.0;
+	float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+
+	float tangetial_factor = tanf(theta);
+
+	float radial_factor = cosf(theta);
+
+
+    //start_angle = PI * start_angle / 180.0;
+	float x = r * cosf(start_angle);//we now start at the start angle
+	float y = r * sinf(start_angle);
+
+	float prevx,prevy;
+    glBegin(GL_POLYGON);
+	for(int i = 0; i < num_segments; i++)
+	{
+	    prevx=x;
+	    prevy=y;
 		glVertex2f(x + cx, y + cy);
 
 		float tx = -y;

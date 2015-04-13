@@ -291,7 +291,6 @@ void Shapes :: drawCurvedRoof(float r, float start_angle, float arc_angle, int n
 
 	float radial_factor = cosf(theta);
 
-
     //start_angle = PI * start_angle / 180.0;
 	float x = r * cosf(start_angle);//we now start at the start angle
 	float y = r * sinf(start_angle);

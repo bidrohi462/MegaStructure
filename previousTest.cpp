@@ -25,14 +25,18 @@ void drawAxes()
 	if(drawaxes==1)
 	{
 		//glColor3f(1.0, 1.0, 1.0);
+		double axesLen=150;
 		glColor3f(colour, colour, colour);
 		glBegin(GL_LINES);{
-			glVertex3f( 100,0,0);
-			glVertex3f(-100,0,0);
-			glVertex3f(0,-100,0);
-			glVertex3f(0, 100,0);
-			glVertex3f(0,0, 100);
-			glVertex3f(0,0,-100);
+		    glColor3f(1.0,0,0);//RED
+			glVertex3f( axesLen,0,0);
+			glVertex3f(-axesLen,0,0);
+			glColor3f(0,1.0,0);//GREEN
+			glVertex3f(0,-axesLen,0);
+			glVertex3f(0, axesLen,0);
+			glColor3f(0,0,1.0);//BLUE
+			glVertex3f(0,0, axesLen);
+			glVertex3f(0,0,-axesLen);
 		}glEnd();
 	}
 }
@@ -156,7 +160,8 @@ void display(){
 
 	//initialize the matrix
 	glLoadIdentity();
-	gluLookAt(100*cos(cameraAngle), 100*sin(cameraAngle), cameraHeight,		0,0,0,		0,0,1);
+	double distance=20;
+	gluLookAt(distance*cos(cameraAngle), distance*sin(cameraAngle), cameraHeight,		0,0,100,		0,0,1);
 
 	//again select MODEL-VIEW
 	glMatrixMode(GL_MODELVIEW);
@@ -183,7 +188,7 @@ void init(){
 	//codes for initialization
 	drawgrid=1;
 	drawaxes=1;
-	cameraHeight=40.0;
+	cameraHeight=150.0;
 	cameraAngle=2.0;
 	angle=0;
 	colour=0;

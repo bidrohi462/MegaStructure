@@ -108,6 +108,8 @@ void drawGrid()
 void myDisplay()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glClearColor(1,1,1,1);	//color black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     drawAxes();
     drawGrid();
@@ -122,7 +124,7 @@ void initCamera()
 {
     glViewport(0,0,640,480);
     Vector3 up(0,0,1);
-    Point3 eye(150.0f,150.0f,150.0f);
+    Point3 eye(-150.0f,150.0f,150.0f);
     Point3 look(0.0f,0.0f,0.0f);
     cam.set(eye,look,up);
     cam.setShape(30.0f,64.0f/48.0f,0.5f,500.0f);
@@ -131,17 +133,19 @@ void initCamera()
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+    //glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(640,480);
     glutInitWindowPosition(50,50);
     glutCreateWindow("fly a camera around a teapot");
+    glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
     glutKeyboardFunc(myKeyboard);
     glutSpecialFunc(specialKeyListener);
     glutDisplayFunc(myDisplay);
-    glClearColor(0,0,0,0);
-    glColor3f(0,0,0);
+    glClearColor(0,0,0,1);
+    //glColor3f(0,0,0);
 
     initCamera();
     glutMainLoop();

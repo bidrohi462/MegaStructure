@@ -24,6 +24,7 @@ public:
 Camera :: Camera()
 {
     //nothing
+    setModelViewMatrix();
 }
 void Camera :: setModelViewMatrix(void)
 {
@@ -90,6 +91,7 @@ void Camera :: setShape(double vAng, double asp, double nearD, double farD)
     glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(viewAngle,asp,nearD,farD);
+    setModelViewMatrix();
 }
 
 #endif // PCAMERA_H

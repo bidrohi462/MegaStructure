@@ -263,9 +263,11 @@ void Tower :: drawSingleBeam()
         }
 /// inner blank portion start here ///////////////////////////////////
 
+        //hexgnSide-=1.0;
         for(int i=0;i<2;i++)
         {
             glColor3f(0.15*i,0.15*i,0.15*i);
+            //glColor3f(0,1.0,0);
             glRotatef(60,0,0,1);
             glBegin(GL_QUADS);
             {
@@ -276,6 +278,7 @@ void Tower :: drawSingleBeam()
             }
             glEnd();
         }
+        //hexgnSide+=1.0;
 
 /// inner blank ends //////////////////////////////////////////////////
         glTranslatef(0,0,beamHeight-.5);
@@ -283,9 +286,11 @@ void Tower :: drawSingleBeam()
         {
             glRotatef(5,0,1,0);
             glRotatef(60,0,0,1);
+            hexgnSide-=0.05;
             for(int i=0;i<2;i++)
             {
                 glColor3f(0.3*i,0.3*i,0.3*i);
+                //glColor3f(0,0.8,0);
                 glRotatef(60,0,0,1);
                 glBegin(GL_QUADS);
                 {
@@ -296,6 +301,7 @@ void Tower :: drawSingleBeam()
                 }
                 glEnd();
             }
+            hexgnSide+=0.05;
         }
         glPopMatrix();
     }
@@ -317,26 +323,56 @@ void Tower :: drawMajorBeams()
 
 void Tower :: drawBeamDetailsHalf()
 {
+    double circleRadius = 0.4;
+    double h1 = 63.137;
+    double h2 = 7.810;
+    double h3= 100.021-h1-h2;
+    double h4 = 100.021;
+    double h5 = 121.95;
     double pnts1[][2]={
         {0.64,0.46}
     };
     double pnts2[][2]={
         {1.4,2.7}
     };
+    /*
     double pnts3[][2]={
         {1.65,2.9}
     };
+    */
     double pnts4[][2]={
         //{0.617,2.143}
-        {0.617,2.4}
+        {0.617,2.25}
     };
-    double circleRadius = 0.4;
+
+    double pnts5[][2]={
+                    {-circleRadius,0}
+                    ,{-circleRadius*0.75,0.66 * circleRadius}
+                    ,{-circleRadius/2.0,0.866 * circleRadius}
+                    ,{0,circleRadius}
+                    ,{circleRadius/2.0,0.866 * circleRadius}
+                    ,{circleRadius*0.75,0.66 * circleRadius}
+                    ,{circleRadius,0}
+            };
+    double pnts6[4][2];
+    pnts6[0][0]=2.8;
+    pnts6[0][1]=0;
+    pnts6[1][0]=(pnts6[0][0]+.428)*cos(PI*67.0/180.0);
+    pnts6[1][1]=(pnts6[0][0]+.428)*sin(PI*60.0/180.0);
+    pnts6[2][0]=-pnts6[1][0];
+    pnts6[2][1]=pnts6[1][1];
+    pnts6[3][0]=-pnts6[0][0];
+    pnts6[3][1]=0;
+
+    double pnts7[][3]={
+        //{3.85,pnts2[0][1]+0.2,h3-2.1+2.4}
+        {3.85,pnts2[0][1]+0.13,h3-2.1+2.4}
+    };
     glPushMatrix();
     {
         glColor3f(0,1.0,0);
-        double h1 = 63.137;
+
         glTranslatef(0,0,h1);
-        //shapes.drawHalfCircle(20);
         glColor3f(1.0,0,0);
         glBegin(GL_QUADS);
         {
@@ -344,79 +380,53 @@ void Tower :: drawBeamDetailsHalf()
             glVertex3f(pnts1[0][0],pnts1[0][1],0);
             glVertex3f(pnts1[0][0],0,0);
             glVertex3f(-pnts1[0][0],0,0);
-            //glVertex3f(pnts1[0][0],-pnts1[0][1],0);
-            //glVertex3f(-pnts1[0][0],-pnts1[0][1],0);
         }
         glEnd();
 
 /// tilted side wall /////////////////////////////////////////////////
-        double h2 = 7.810;
+
         glColor3f(0.9,0.9,0.2);
         glBegin(GL_QUADS);
         {
             glVertex3f(pnts2[0][0],pnts2[0][1],h2);
             glVertex3f(pnts1[0][0],pnts1[0][1],0);
-            //glVertex3f(-pnts1[0][0],0,0);
-            //glVertex3f(-pnts2[0][0],0,0);
             glVertex3f(-pnts1[0][0],pnts1[0][1],0);
             glVertex3f(-pnts2[0][0],pnts2[0][1],h2);
         }
         glEnd();
 
         glTranslatef(0,0,h2);
-        //shapes.drawHalfCircle(20);
-        glColor3f(1.0,0,0);
+        glColor3f(0.5,0.5,0.5);
 
 /// tilted side wall end //////////////////////////////////////////////////
-        /*
-        glBegin(GL_QUADS);
-        {
-            glVertex3f(-pnts2[0][0],pnts2[0][1],0);
-            glVertex3f(pnts2[0][0],pnts2[0][1],0);
-            //glVertex3f(pnts2[0][0],-pnts2[0][1],0);
-            glVertex3f(pnts2[0][0],0,0);
-            //glVertex3f(-pnts2[0][0],-pnts2[0][1],0);
-            glVertex3f(-pnts2[0][0],0,0);
-        }
-        glEnd();
-*/
-        double h3= 100.021-h1-h2;
-        //h3+=2.4;
+
 /// intrusion and curved wall ///////////////////////////////////////////////
+        glTranslatef(0,0,.01);
         glBegin(GL_QUADS);
         {
-            glVertex3f(pnts2[0][0]/2,pnts2[0][1],h3);
+            glVertex3f(pnts2[0][0]/2,pnts2[0][1],h3+.15);
             glVertex3f(pnts2[0][0],pnts2[0][1],0);
             glVertex3f(-pnts2[0][0],pnts2[0][1],0);
-            glVertex3f(-pnts2[0][0]/2,pnts2[0][1],h3);
+            glVertex3f(-pnts2[0][0]/2,pnts2[0][1],h3+.15);
         }
         glEnd();
 /// /////////////////////////////////////////////////////////////////
 
         h3+=2.4;
-        //glColor3f(0,1.0,0);
-/*
-        glTranslatef(0,0,h3);
-        glBegin(GL_QUADS);
-        {
-            glVertex3f(-pnts2[0][0]/2,pnts2[0][1],0);
-            glVertex3f(pnts2[0][0]/2,pnts2[0][1],0);
-            //glVertex3f(pnts2[0][0]/2,-pnts2[0][1],0);
-            glVertex3f(pnts2[0][0]/2,0,0);
-            //glVertex3f(-pnts2[0][0]/2,-pnts2[0][1],0);
-            glVertex3f(-pnts2[0][0]/2,0,0);
-        }
-        glEnd();
-*/
         glPushMatrix();
         {
             glTranslatef(0,pnts2[0][1],h3);
             glRotatef(90,1,0,0);
-            shapes.drawHalfCircle(circleRadius);
-            glColor3f(0,0,1.0);
-            shapes.drawCurvedWall(pnts2[0][0]/2.0-0.3,0,PI,10,-0.2);
 
-            glColor3f(0,0,1.0);
+            /// half circle shape floor
+            glColor3f(0.5,0.5,0.5);
+            shapes.drawPolygon(7,pnts5);
+
+            /// half circle shape wall
+            glColor3f(0,0,0);
+            shapes.drawWalls(7,pnts5,-0.2);
+
+            //glColor3f(0,0,1.0);
             glBegin(GL_QUADS);
             {
                 glVertex3f( circleRadius ,0, 0);
@@ -427,7 +437,7 @@ void Tower :: drawBeamDetailsHalf()
             glEnd();
 
             glBegin(GL_QUADS);
-            {
+            {   //edit
                 glVertex3f( -circleRadius ,0, 0);
                 glVertex3f( -circleRadius ,0,-0.2);
                 glVertex3f( -pnts4[0][0]  ,-pnts4[0][1],-0.2);
@@ -435,33 +445,80 @@ void Tower :: drawBeamDetailsHalf()
             }
             glEnd();
 
-            glColor3f(0.5,0.8,0.9);
+            glColor3f(0.5,0.5,0.5);
             glBegin(GL_QUADS);
             {
                 glVertex3f( circleRadius ,0, 0);
                 glVertex3f( -circleRadius ,0,0);
-                glVertex3f( -pnts4[0][0]  ,-pnts4[0][1],0);
+                glVertex3f( -pnts4[0][0] ,-pnts4[0][1],0);
                 glVertex3f( pnts4[0][0]  ,-pnts4[0][1],0);
             }
             glEnd();
-
-/*
-            glPushMatrix();
-            {
-                glRotatef(180,0,1,0);
-                glBegin(GL_QUADS);
-                {
-                    glVertex3f( circleRadius ,0, 0);
-                    glVertex3f( circleRadius ,0,-0.2);
-                    glVertex3f( pnts4[0][0]  ,-pnts4[0][1],-0.2);
-                    glVertex3f( pnts4[0][0]  ,-pnts4[0][1],0);
-                }
-                glEnd();
-            }
-            glPopMatrix();
-            */
         }
         glPopMatrix();
+
+        glColor3f(0.7,0.7,0.7);
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(0,pnts2[0][1]+0.2,h3+pnts5[6][0]);
+            glVertex3f(-pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+            glVertex3f(pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+        }
+        glEnd();
+
+/// three thin strips from half circle wall //////////////////////////////////
+        for( int i=0;i<3;i++)
+        {
+            glBegin(GL_POLYGON);
+            {
+                glVertex3f(pnts5[i][0],pnts2[0][1]+0.2,h3+pnts5[i][1]);
+                glVertex3f(pnts5[i+1][0],pnts2[0][1]+0.2,h3+pnts5[i+1][1]);
+                glVertex3f(-pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+            }
+            glEnd();
+        }
+        for( int i=0;i<3;i++)
+        {
+            glBegin(GL_POLYGON);
+            {
+                glVertex3f(-pnts5[i][0],pnts2[0][1]+0.2,h3+pnts5[i][1]);
+                glVertex3f(-pnts5[i+1][0],pnts2[0][1]+0.2,h3+pnts5[i+1][1]);
+                glVertex3f(+pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+            }
+            glEnd();
+        }
+
+/// pair /////////////////////////////////////////////////////////////////////
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(-pnts5[0][0],pnts2[0][1]+0.2,h3+pnts5[0][1]);
+            glVertex3f(pnts7[0][0],pnts7[0][1],pnts7[0][2]);
+            glVertex3f(pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+        }
+        glEnd();
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(pnts5[0][0],pnts2[0][1]+0.2,h3+pnts5[0][1]);
+            glVertex3f(-pnts7[0][0],pnts7[0][1],pnts7[0][2]);
+            glVertex3f(-pnts6[1][0],pnts2[0][1],h5-h4+h3-2.4);
+        }
+        glEnd();
+
+/// pair ///////////////////////////////////////////////////////////////////
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(-pnts5[0][0],pnts2[0][1]+0.2,h3+pnts5[0][1]);
+            glVertex3f(pnts7[0][0],pnts7[0][1],pnts7[0][2]);
+            glVertex3f(pnts4[0][0],pnts2[0][1]+0.2,h3-pnts4[0][1]);
+        }
+        glEnd();
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(pnts5[0][0],pnts2[0][1]+0.2,h3+pnts5[0][1]);
+            glVertex3f(-pnts7[0][0],pnts7[0][1],pnts7[0][2]);
+            glVertex3f(-pnts4[0][0],pnts2[0][1]+0.2,h3-pnts4[0][1]);
+        }
+        glEnd();
     }
     glPopMatrix();
 }
@@ -478,6 +535,7 @@ void Tower :: drawBeamDetails()
 }
 void Tower :: drawUpperConeHalf()
 {
+/// lower hexagon co-ordinates //////////////////////////////////
     double pnts1[4][2];
     pnts1[0][0]=2.8;
     pnts1[0][1]=0;
@@ -488,6 +546,7 @@ void Tower :: drawUpperConeHalf()
     pnts1[3][0]=-pnts1[0][0];
     pnts1[3][1]=0;
 
+/// upper hexagon co-ordinates ///////////////////////////////////
     double pnts2[4][2];
     pnts2[0][0]=.09;
     pnts2[0][1]=0;
@@ -532,7 +591,14 @@ void Tower :: drawUpperCone()
         glRotatef(180,0,0,1);
         drawUpperConeHalf();
     }
+
     glPopMatrix();
+    /*
+    GLUquadricObj *quadratic;
+    quadratic = gluNewQuadric();
+    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+    gluCylinder(quadratic,0.1f,5.0f,10.0f,4,4);
+    */
 }
 #endif // TOWER_H
 

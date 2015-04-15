@@ -295,12 +295,12 @@ void Shapes :: drawCurvedRoof(float r, float start_angle, float arc_angle, int n
 	float x = r * cosf(start_angle);//we now start at the start angle
 	float y = r * sinf(start_angle);
 
-	float prevx,prevy;
+	//float prevx,prevy;
     glBegin(GL_POLYGON);
 	for(int i = 0; i < num_segments; i++)
 	{
-	    prevx=x;
-	    prevy=y;
+	    //prevx=x;
+	    //prevy=y;
 		glVertex2f(x + cx, y + cy);
 
 		float tx = -y;

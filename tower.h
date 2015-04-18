@@ -12,6 +12,7 @@ class Tower
         double lowerBaseRadius;
         double upperBaseHeight;
         double beamHeight;
+        double coneStartingHeight;
         void drawLowerBase();
         void drawUpperBase();
         void drawSingleBeam();
@@ -20,6 +21,8 @@ class Tower
         void drawBeamDetails();
         void drawUpperConeHalf();
         void drawUpperCone();
+        void drawSingleArch(double thickness);
+        void drawArch();
 
     public:
         Tower();
@@ -32,7 +35,7 @@ Tower :: Tower()
     lowerBaseHeight=2.5;
     upperBaseHeight=4.179;
     beamHeight=100.021;
-
+    coneStartingHeight=121.95;
 }
 
 void Tower :: drawTower()
@@ -41,6 +44,7 @@ void Tower :: drawTower()
     drawUpperBase();
     drawMajorBeams();
     drawUpperCone();
+    drawArch();
 }
 
 void Tower :: drawLowerBase()
@@ -308,7 +312,6 @@ void Tower :: drawSingleBeam()
     glPopMatrix();
 
 }
-
 void Tower :: drawMajorBeams()
 {
     glPushMatrix();
@@ -583,6 +586,7 @@ void Tower :: drawUpperConeHalf()
     }
     glPopMatrix();
 }
+
 void Tower :: drawUpperCone()
 {
     glPushMatrix();
@@ -600,5 +604,67 @@ void Tower :: drawUpperCone()
     gluCylinder(quadratic,0.1f,5.0f,10.0f,4,4);
     */
 }
-#endif // TOWER_H
+void Tower :: drawSingleArch(double thickness)
+{
+    /// marker starts
+    double arcStartHeight = 23;
+    double arcEndHeight = 122;
 
+    glPushMatrix();
+    {
+        glColor3f(0,0.7,0);
+        glTranslatef(0,0,23);
+        shapes.drawHalfCircle(10);
+    }
+    glPopMatrix();
+    glPushMatrix();
+    {
+        glColor3f(0,0.7,0);
+        glTranslatef(0,0,116);
+        //shapes.drawHalfCircle(10);
+    }
+    glPopMatrix();
+    /// marker ends
+
+    //double radius = 126.5;
+    double radius = 90;
+    double span = (arcEndHeight-arcStartHeight)/2.0;
+    //double stAng = -21.37;
+    double stAng = asin(span/radius)*180/PI;
+    double x = span * tan(PI*stAng/180.0);
+    glPushMatrix();
+    {
+        glColor3f(1.0,1.0,0);
+
+        //glRotatef(-35,0,0,1);
+        glTranslatef(0,0,(arcStartHeight+arcEndHeight)/2.0);
+        shapes.drawHalfCircle(10);
+        glTranslatef(0,-sqrt(radius*radius-span*span),0);
+        //shapes.drawHalfCircle(15);
+        glColor3f(1,0,0);
+        glRotatef(90,0,1,0);
+
+        //glRotatef(20,0,0,1);
+        //shapes.drawArc(50,20*PI/180.0,120*PI/180.0,10);
+        //shapes.drawHalfCircle(radius);
+        //shapes.drawArc(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10);
+        //shapes.drawCurvedWall(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
+        shapes.drawArchShape(radius-3,radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
+
+    }
+    glPopMatrix();
+}
+void Tower :: drawArch()
+{
+    double ang = 35;
+    glPushMatrix();
+    {
+        glRotatef(-ang,0,0,1);
+        drawSingleArch(1);
+        glRotatef(2*ang,0,0,1);
+        drawSingleArch(1);
+    }
+    glPopMatrix();
+}
+
+#endif // TOWER_H

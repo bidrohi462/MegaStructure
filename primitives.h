@@ -22,6 +22,7 @@ class Shapes
         void drawArc(float r, float start_angle, float arc_angle, int num_segments);
         void drawCurvedWall(float r, float start_angle, float arc_angle, int num_segments,double height);
         void drawCurvedRoof(float r, float start_angle, float arc_angle, int num_segments);
+        void drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
 };
 
 void Shapes :: drawsphere(float radius)
@@ -313,6 +314,126 @@ void Shapes :: drawCurvedRoof(float r, float start_angle, float arc_angle, int n
 		y *= radial_factor;
 	}
 	glEnd();
+}
+
+void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness)
+{
+    float cx=0, cy=0;
+
+	float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+
+	float tangetial_factor = tanf(theta);
+
+	float radial_factor = cosf(theta);
+
+
+    //start_angle = PI * start_angle / 180.0;
+	float x = outRadius * cosf(start_angle);//we now start at the start angle
+	float y = outRadius * sinf(start_angle);
+
+	float inX = inRadius * cosf(start_angle);
+	float inY = inRadius * sinf(start_angle);
+
+	float prevx,prevy,prevInX,prevInY;
+	double colour = 0.0;
+
+	for(int i = 0; i < num_segments-1; i++)
+	{
+	    prevx=x;
+	    prevy=y;
+
+		//glVertex2f(x + cx, y + cy);
+/// update outer circle
+		float tx = -y;
+		float ty = x;
+
+		x += tx * tangetial_factor;
+		y += ty * tangetial_factor;
+
+		x *= radial_factor;
+		y *= radial_factor;
+
+        //colour+=0.2;
+        glColor3f(colour+0.2,colour+0.2,colour+0.2);
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevx,prevy,-thickness/2.0);
+            glVertex3f(prevx,prevy,thickness/2.0);
+            glVertex3f(x,y,thickness/2.0);
+            glVertex3f(x,y,-thickness/2.0);
+		}
+		glEnd();
+
+/// update inner circle
+
+        prevInX=inX;
+        prevInY=inY;
+
+        glColor3f(1,0,0);
+        glPushMatrix();
+        {
+            glTranslatef(inX -5, inY ,0);
+            //drawHalfCircle(5);
+        }
+        glPopMatrix();
+        float txin = -inY;
+        float tyin = inX;
+        inX += txin * tangetial_factor;
+		inY += tyin * tangetial_factor;
+
+		inX *= radial_factor;
+		inY *= radial_factor;
+
+		//colour+=0.2;
+		/// inner edge
+        glColor3f(colour+0.4,colour+0.4,colour+0.4);
+        prevInX+=2;
+        inX+=2;
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevInX,prevInY,-thickness/2.0);
+            glVertex3f(prevInX,prevInY,thickness/2.0);
+            glVertex3f(inX,inY,thickness/2.0);
+            glVertex3f(inX,inY,-thickness/2.0);
+		}
+		glEnd();
+		inX-=2;
+		prevInX-=2;
+
+/// curve side wall
+
+        //colour+=0.2;
+        glColor3f(colour+0.6,colour+0.6,colour+0.6);
+        prevInX+=2;
+        inX+=2;
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevInX,prevInY,-thickness/2.0);
+            glVertex3f(prevx,prevy,-thickness/2.0);
+            glVertex3f(x,y,-thickness/2.0);
+            glVertex3f(inX,inY,-thickness/2.0);
+		}
+		glEnd();
+		inX-=2;
+		prevInX-=2;
+
+		//colour+=0.2;
+        glColor3f(colour+0.6,colour+0.6,colour+0.6);
+        prevInX+=2;
+        inX+=2;
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevInX,prevInY,thickness/2.0);
+            glVertex3f(prevx,prevy,thickness/2.0);
+            glVertex3f(x,y,thickness/2.0);
+            glVertex3f(inX,inY,thickness/2.0);
+		}
+		glEnd();
+		inX-=2;
+		prevInX-=2;
+
+
+	}
 }
 #endif // PRIMITIVES_H
 

@@ -22,6 +22,7 @@ class Shapes
         void drawArc(float r, float start_angle, float arc_angle, int num_segments);
         void drawCurvedWall(float r, float start_angle, float arc_angle, int num_segments,double height);
         void drawCurvedRoof(float r, float start_angle, float arc_angle, int num_segments);
+        void drawArchShapeOld(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
         void drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
 };
 
@@ -316,9 +317,10 @@ void Shapes :: drawCurvedRoof(float r, float start_angle, float arc_angle, int n
 	glEnd();
 }
 
-void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness)
+void Shapes :: drawArchShapeOld(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness)
 {
-    float cx=0, cy=0;
+    //float cx=0, cy=0;
+    double innerShift=-2;
 
 	float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
 
@@ -337,7 +339,7 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
 	float prevx,prevy,prevInX,prevInY;
 	double colour = 0.0;
 
-	for(int i = 0; i < num_segments-1; i++)
+	for(int i = 0; i < num_segments-2; i++)
 	{
 	    prevx=x;
 	    prevy=y;
@@ -387,8 +389,8 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
 		//colour+=0.2;
 		/// inner edge
         glColor3f(colour+0.4,colour+0.4,colour+0.4);
-        prevInX+=2;
-        inX+=2;
+        prevInX+=innerShift;
+        inX+=innerShift;
 		glBegin(GL_QUADS);
 		{
             glVertex3f(prevInX,prevInY,-thickness/2.0);
@@ -397,15 +399,15 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
             glVertex3f(inX,inY,-thickness/2.0);
 		}
 		glEnd();
-		inX-=2;
-		prevInX-=2;
+		inX-=innerShift;
+		prevInX-=innerShift;
 
 /// curve side wall
 
         //colour+=0.2;
         glColor3f(colour+0.6,colour+0.6,colour+0.6);
-        prevInX+=2;
-        inX+=2;
+        prevInX+=innerShift;
+        inX+=innerShift;
 		glBegin(GL_QUADS);
 		{
             glVertex3f(prevInX,prevInY,-thickness/2.0);
@@ -414,13 +416,13 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
             glVertex3f(inX,inY,-thickness/2.0);
 		}
 		glEnd();
-		inX-=2;
-		prevInX-=2;
+		inX-=innerShift;
+		prevInX-=innerShift;
 
 		//colour+=0.2;
         glColor3f(colour+0.6,colour+0.6,colour+0.6);
-        prevInX+=2;
-        inX+=2;
+        prevInX+=innerShift;
+        inX+=innerShift;
 		glBegin(GL_QUADS);
 		{
             glVertex3f(prevInX,prevInY,thickness/2.0);
@@ -429,11 +431,246 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
             glVertex3f(inX,inY,thickness/2.0);
 		}
 		glEnd();
-		inX-=2;
-		prevInX-=2;
+		inX-=innerShift;
+		prevInX-=innerShift;
+	}
+	static bool printed = false;
+	if(!printed)
+    {
+            printed=true;
+        	printf("x=%f,y=%f\n",x,y);
+    }
 
+}
+void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness)
+{
+    float cx=0, cy=0;
+    double innerShift=-2;
+
+	float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+
+	float tangetial_factor = tanf(theta);
+
+	float radial_factor = cosf(theta);
+
+
+    //start_angle = PI * start_angle / 180.0;
+	float x = outRadius * cosf(start_angle);//we now start at the start angle
+	float y = outRadius * sinf(start_angle);
+
+	float inX = inRadius * cosf(start_angle);
+	float inY = inRadius * sinf(start_angle);
+
+	float prevx,prevy,prevInX,prevInY;
+	double colour = 0.0;
+
+    //glBegin(GL_LINE_STRIP);
+	for(int i = 0; i < num_segments-3; i++)
+	{
+	    prevx=x;
+	    prevy=y;
+
+		//glVertex3f(0,y,x);
+
+/// update outer circle
+		float tx = -y;
+		float ty = x;
+
+		x += tx * tangetial_factor;
+		y += ty * tangetial_factor;
+
+		x *= radial_factor;
+		y *= radial_factor;
+
+        //colour+=0.2;
+        glColor3f(colour+0.2,colour+0.2,colour+0.2);
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(-thickness/2.0,prevy,prevx);
+            glVertex3f(thickness/2.0,prevy,prevx);
+            glVertex3f(thickness/2.0,y,x);
+            glVertex3f(-thickness/2.0,y,x);
+		}
+		glEnd();
+
+/// update inner circle
+
+        prevInX=inX;
+        prevInY=inY;
+
+        glColor3f(1,0,0);
+        glPushMatrix();
+        {
+            glTranslatef(inX -5, inY ,0);
+            //drawHalfCircle(5);
+        }
+        glPopMatrix();
+        float txin = -inY;
+        float tyin = inX;
+        inX += txin * tangetial_factor;
+		inY += tyin * tangetial_factor;
+
+		inX *= radial_factor;
+		inY *= radial_factor;
+
+		//colour+=0.2;
+		/// inner edge
+        glColor3f(colour+0.4,colour+0.4,colour+0.4);
+        prevInX+=innerShift;
+        inX+=innerShift;
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(-thickness/2.0,prevInY,prevInX);
+            glVertex3f(thickness/2.0,prevInY,prevInX);
+            glVertex3f(thickness/2.0,inY,inX);
+            glVertex3f(-thickness/2.0,inY,inX);
+		}
+		glEnd();
+		inX-=innerShift;
+		prevInX-=innerShift;
+
+/// curve side wall
+
+        //colour+=0.2;
+        glColor3f(colour+0.6,colour+0.6,colour+0.6);
+        prevInX+=innerShift;
+        inX+=innerShift;
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(-thickness/2.0,prevInY,prevInX);
+            glVertex3f(-thickness/2.0,prevy,prevx);
+            glVertex3f(-thickness/2.0,y,x);
+            glVertex3f(-thickness/2.0,inY,inX);
+		}
+		glEnd();
+		inX-=innerShift;
+		prevInX-=innerShift;
+
+		//colour+=0.2;
+        glColor3f(colour+0.6,colour+0.6,colour+0.6);
+        prevInX+=innerShift;
+        inX+=innerShift;
+        glBegin(GL_QUADS);
+		{
+            glVertex3f(thickness/2.0,prevInY,prevInX);
+            glVertex3f(thickness/2.0,prevy,prevx);
+            glVertex3f(thickness/2.0,y,x);
+            glVertex3f(thickness/2.0,inY,inX);
+		}
+		glEnd();
+        /*
+		glBegin(GL_QUADS);
+		{
+            glVertex3f(prevInX,prevInY,thickness/2.0);
+            glVertex3f(prevx,prevy,thickness/2.0);
+            glVertex3f(x,y,thickness/2.0);
+            glVertex3f(inX,inY,thickness/2.0);
+		}
+		glEnd();
+		*/
+		inX-=innerShift;
+		prevInX-=innerShift;
 
 	}
+	// glEnd();
+/// lower irregular part
+
+    double yTrans = 62;
+    double minHeight = 50;
+    double span = 8.850;
+
+    glPushMatrix();
+    {
+        //drawHalfCircle(14.5);
+        glTranslatef(0,yTrans,0);
+        //glTranslatef(0,2*yTrans,0);
+        //yTrans=0;
+
+        //glColor3f(1.0,0,0);
+    /// pair /////////////////////////////////////////////////////
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(-thickness/2.0,y-yTrans,x);
+            glVertex3f(-thickness/2.0,0,-minHeight);
+            glVertex3f(-thickness/2.0,0,-minHeight+span);
+            glVertex3f(-thickness/2.0,inY-yTrans,inX-2.0);
+        }
+        glEnd();
+
+        glColor3f(0,0,0);
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(thickness/2.0,y-yTrans,x);
+            glVertex3f(thickness/2.0,0,-minHeight);
+            glVertex3f(thickness/2.0,0,-minHeight+span);
+            glVertex3f(thickness/2.0,inY-yTrans,inX-2.0);
+        }
+        glEnd();
+    /// pair /////////////////////////////////////////////////////////////////
+        glColor3f(0,1.0,0);
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(thickness/2.0,y-yTrans,x);
+            glVertex3f(-thickness/2.0,y-yTrans,x);
+            glVertex3f(-thickness/2.0,0,-minHeight);
+            glVertex3f(thickness/2.0,0,-minHeight);
+        }
+        glEnd();
+        glColor3f(0,0,1.0);
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(thickness/2.0,inY-yTrans,inX-2.0);
+            glVertex3f(-thickness/2.0,inY-yTrans,inX-2.0);
+            glVertex3f(-thickness/2.0,0,-minHeight+span);
+            glVertex3f(thickness/2.0,0,-minHeight+span);
+        }
+        glEnd();
+        //drawHalfCircle(14.5);
+        /// end of the arch attached to base
+        glPushMatrix();
+        {
+            double slope = (x+minHeight)/(y-yTrans);
+            double zz = -77 ;
+            double xx =(zz+minHeight)/slope-7;
+            //xx=-25;
+
+            //glRotatef(14,0,0,1);
+            double shiftX = 0;
+            glColor3f(0,0.5,1.0);
+            glBegin(GL_LINE_LOOP);
+            {
+                glVertex3f(thickness/2.0+shiftX,xx,zz);
+                glVertex3f(-thickness/2.0+shiftX,xx,zz);
+                glVertex3f(-thickness/2.0,0,-minHeight+span);
+                glVertex3f(thickness/2.0,0,-minHeight+span);
+            }
+            glEnd();
+
+            xx+=10;
+            glBegin(GL_POLYGON);
+            {
+                glVertex3f(thickness/2.0,xx,zz);
+                glVertex3f(-thickness/2.0,xx,zz);
+                glVertex3f(-thickness/2.0,0,-minHeight);
+                glVertex3f(thickness/2.0,0,-minHeight);
+            }
+            glEnd();
+        }
+        glPopMatrix();
+    }
+    glPopMatrix();
+    //glTranslatef(0,0,-72);
+    //drawHalfCircle(10);
+
+	static bool printed = false;
+	if(!printed)
+    {
+            printed=true;
+        	printf("z=%f,y=%f,inz=%f,iny=%f\n",x,y,inX,inY);
+        	printf("y-ytrans=%f,iny-ytras=%f\n",y-yTrans,inY-yTrans);
+    }
+
 }
+
 #endif // PRIMITIVES_H
 

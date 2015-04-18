@@ -627,42 +627,70 @@ void Tower :: drawSingleArch(double thickness)
     /// marker ends
 
     //double radius = 126.5;
-    double radius = 90;
+    double radius = 80;
     double span = (arcEndHeight-arcStartHeight)/2.0;
     //double stAng = -21.37;
-    double stAng = asin(span/radius)*180/PI;
-    double x = span * tan(PI*stAng/180.0);
+    //double stAng = asin(span/radius)*180/PI;
+    double stAng = asin(span/radius);
+    //double x = span * tan(stAng);
+    //double x = span * tan(PI*stAng/180.0);
     glPushMatrix();
     {
         glColor3f(1.0,1.0,0);
 
         //glRotatef(-35,0,0,1);
         glTranslatef(0,0,(arcStartHeight+arcEndHeight)/2.0);
-        shapes.drawHalfCircle(10);
+        shapes.drawHalfCircle(14.5);
         glTranslatef(0,-sqrt(radius*radius-span*span),0);
         //shapes.drawHalfCircle(15);
         glColor3f(1,0,0);
-        glRotatef(90,0,1,0);
+
+        /// comment out this for drawArchShapeOld
+        //glRotatef(-90,0,1,0);
 
         //glRotatef(20,0,0,1);
         //shapes.drawArc(50,20*PI/180.0,120*PI/180.0,10);
         //shapes.drawHalfCircle(radius);
         //shapes.drawArc(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10);
         //shapes.drawCurvedWall(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
-        shapes.drawArchShape(radius-3,radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
+        //shapes.drawArchShape(radius-3,radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
+        shapes.drawArchShape(radius-3,radius,(PI/2.0-stAng),2*stAng,12,thickness);
+
+/// lower irregular part of the arch
+/*
+        double yTrans = +sqrt(radius*radius-span*span);
+
+        double x=-28.612865;
+        double y= 85.330551;
+        double inX=-29.659113;
+        double inY= 82.486206;
+        glTranslatef(0,yTrans,0);
+        //glColor3f(0,1,1);
+        //shapes.drawHalfCircle(10);
+
+        glBegin(GL_POLYGON);
+        {
+            glVertex3f(-thickness/2.0,y-yTrans,x);
+            glVertex3f(-thickness/2.0,0,-span);
+            glVertex3f(-thickness/2.0,0,-span+8.850);
+            glVertex3f(-thickness/2.0,inY-yTrans,inX);
+        }
+        glEnd();
+*/
+
 
     }
     glPopMatrix();
 }
 void Tower :: drawArch()
 {
-    double ang = 35;
+    double ang = 40;
     glPushMatrix();
     {
         glRotatef(-ang,0,0,1);
         drawSingleArch(1);
         glRotatef(2*ang,0,0,1);
-        drawSingleArch(1);
+        //drawSingleArch(1);
     }
     glPopMatrix();
 }

@@ -25,6 +25,7 @@ struct Vector3{
     double dot(Vector3 a);//prototype
     Vector3 cross(Vector3 a);//prototype
     void normalize();//prototype
+    double getMagnitude();
 };
 typedef Vector3 Vector3;
 double Vector3 :: dot(Vector3 a)
@@ -41,6 +42,11 @@ void Vector3:: normalize()
 {
     double d=sqrt(x*x+y*y+z*z);
     this->set(x/d,y/d,z/d);
+}
+
+double Vector3:: getMagnitude()
+{
+    return sqrt(x*x+y*y+z*z);
 }
 
 #endif // CUSTOMTYPES_H

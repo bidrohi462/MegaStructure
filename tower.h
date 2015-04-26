@@ -11,6 +11,8 @@ class Tower
         double lowerBaseHeight;
         double lowerBaseRadius;
         double upperBaseHeight;
+        double railingRadius;
+        double railingHeight;
         double beamHeight;
         double coneStartingHeight;
         void drawLowerBase();
@@ -38,6 +40,8 @@ Tower :: Tower()
     upperBaseHeight=4.179;
     beamHeight=100.021;
     coneStartingHeight=121.95;
+    railingRadius = 0.1;
+    railingHeight=1.065;
 }
 
 void Tower :: drawTower()
@@ -47,8 +51,11 @@ void Tower :: drawTower()
     drawMajorBeams();
     drawUpperCone();
     drawArch();
-    //shapes.drawRoundedBeam(20.0, 120.0, 15);
-    drawBeams(12);
+    ///
+    /// comment by bidrohi
+    /// shapes.drawRoundedBeam(20.0, 120.0, 15);
+    ///
+    //drawBeams(12);
 }
 
 void Tower :: drawLowerBase()
@@ -75,12 +82,18 @@ void Tower :: drawLowerBase()
         };
         shapes.drawWalls(5,pnts2,lowerBaseHeight);
 
-
 /// lower layer roof starts here /////////////////////////////////////////
         glTranslatef(0,0,lowerBaseHeight);
+        double pnts7[][2]={
+            {-lowerBaseRadius+4.456,0}
+            ,{-lowerBaseRadius+4.456,-10}
+        };
+
+        glColor3f(0,0,0.8);
+        shapes.drawWalls(2,pnts7,0.8);
 
         glColor3f(0.5,0.5,0.5);
-        shapes.drawHalfCylinder(lowerBaseRadius-4.546,0.8);
+        shapes.drawHalfCylinder(lowerBaseRadius-4.456,0.8);
 
         glColor3f(0.8,0.8,0);
         shapes.drawHalfCircle(lowerBaseRadius);
@@ -112,25 +125,146 @@ void Tower :: drawLowerBase()
         shapes.drawPolygon(3,pnts5);
 
 
-/// translation for upper layer
+        /// translation for upper layer
         glTranslatef(0,0,0.8);
+        //shapes.drawHalfCircle(20);
+/// circular railing //////////////////////////////////////////
+        int lowRailCount = 30;
+        double rotAng=180.0/lowRailCount;
+        glColor3f(0,0,0);
+
+        glPushMatrix();
+        {
+            for(int i=0;i<lowRailCount-1;i++)
+            {
+                glRotatef(rotAng,0,0,1);
+                glPushMatrix();
+                {
+                    glTranslatef(lowerBaseRadius-4.6,0,0);
+                    glColor3f(0,0,0);
+                    shapes.drawVertRailing(0,0,0,railingRadius,railingHeight+0.1);
+                    glPushMatrix();
+                    {
+
+                        glTranslatef(0,0,railingHeight+0.1);
+                        glColor3f(0.5,0.5,0.5);
+                        shapes.drawHorzRailing(0,0,
+                                (lowerBaseRadius-4.6)*(1-cos(rotAng*PI/180))-0.16,
+                                (lowerBaseRadius-4.6)*(sin(rotAng*PI/180)),
+                                railingRadius);
+                    }
+                    glPopMatrix();
+                }
+                glPopMatrix();
+
+            }
+        }
+        glPopMatrix();
+
+        lowRailCount=6;
+        double segLen = (pnts7[0][1]+9.807)/lowRailCount;
+        glPushMatrix();
+        {
+            glTranslatef(-lowerBaseRadius+4.6,segLen,0);
+            for(int i=0;i<lowRailCount+1;i++)
+            {
+                glTranslatef(0,-segLen,0);
+                shapes.drawVertRailing(0,0,0,
+                                   railingRadius,railingHeight+0.1);
+
+                if(i==lowRailCount)break;
+                glPushMatrix();
+                {
+                    glTranslatef(0,0,railingHeight+0.1);
+                    shapes.drawHorzRailing(0,0,0,-segLen,railingRadius);
+                }
+                glPopMatrix();
+            }
+        }
+        glPopMatrix();
 
         glColor3f(0,0.8,0);
         shapes.drawHalfCircle(lowerBaseRadius-4.456);
+        /// right stair ////////////////////////////////
+
+        /// right stair end ////////////////////////////
 
 /// drawing irregular shaped portion in upper layer
         //glColor3f(0,0,1.0);
         double pnts6[][2]={
             {lowerBaseRadius-4.456,0}
-            ,{-lowerBaseRadius+4.456,0}
-            ,{-lowerBaseRadius+4.456,-9.804}
+            ,{-lowerBaseRadius+4.456+1.369,-10}
+            //,{-lowerBaseRadius+4.456,-9.804}
+            //,{-lowerBaseRadius+4.456,-10}
             ,{0,-33.411}
         };
-        shapes.drawPolygon(4,pnts6);
+        shapes.drawPolygon(3,pnts6);
+        double pnts8[][2]={
+            {lowerBaseRadius-4.456,0}
+            ,{-lowerBaseRadius+4.456,0}
+            ,{-lowerBaseRadius+4.456,-10}
+            ,{-lowerBaseRadius+4.456+1.369,-10}
+        };
+        shapes.drawPolygon(4,pnts8);
+        double pnts9[][2]={
+            {-lowerBaseRadius+4.456,-10}
+            ,{-lowerBaseRadius+4.456+1.369,-10}
+        };
+        glColor3f(0.5,0.5,0.5);
+        shapes.drawWalls(2,pnts9,-0.8);
+        int totalStairStep = 5;
+        double stairTrans = -0.8/totalStairStep;
+        double stairWidth = 2.57/totalStairStep;
+
+        double shiftune = 5.0;
+
+        double slop = (-10+33.411)/(-lowerBaseRadius+4.456+1.369);
+        glColor3f(0,0,0);
+
+        glPushMatrix();
+        {
+            glTranslatef(0,2*stairWidth,0);
+            glColor3f(0.8,0.8,0.8);
+            glBegin(GL_POLYGON);
+                {
+                    glVertex3f(-lowerBaseRadius+shiftune-stairWidth,slop*(-lowerBaseRadius+shiftune)-33.411,0);
+                    glVertex3f(-lowerBaseRadius+shiftune-stairWidth,slop*(-lowerBaseRadius+shiftune)-33.411,stairTrans);
+                    glVertex3f(-stairWidth,-33.411,stairTrans);
+                    glVertex3f(-stairWidth,-33.411,0);
+                }
+                glEnd();
+            //glTranslatef(0,stairWidth,0);
+            for(int i=0;i<totalStairStep-1;i++)
+            {
+                //glTranslatef(0,-stairWidth,stairTrans);
+                glTranslatef(0,-stairWidth,stairTrans);
+                glColor3f(0.3,0.3,0.3);
+                glBegin(GL_POLYGON);
+                {
+                    glVertex3f(-lowerBaseRadius+shiftune,
+                               slop*(-lowerBaseRadius+shiftune)-33.411,0);
+                    glVertex3f(-lowerBaseRadius+shiftune-stairWidth,
+                        slop*(-lowerBaseRadius+shiftune)-33.411,0);
+                    glVertex3f(-stairWidth,-33.411,0);
+                    glVertex3f(0,-33.411,0);
+                }
+                glEnd();
+
+                glColor3f(0.8,0.8,0.8);
+                glBegin(GL_POLYGON);
+                {
+                    glVertex3f(-lowerBaseRadius+shiftune-stairWidth,slop*(-lowerBaseRadius+shiftune)-33.411,0);
+                    glVertex3f(-lowerBaseRadius+shiftune-stairWidth,slop*(-lowerBaseRadius+shiftune)-33.411,stairTrans);
+                    glVertex3f(-stairWidth,-33.411,stairTrans);
+                    glVertex3f(-stairWidth,-33.411,0);
+                }
+                glEnd();
+            }
+
+        }
+        glPopMatrix();
 
     }glPopMatrix();
-
-
 }
 
 void Tower :: drawUpperBase()
@@ -238,6 +372,117 @@ void Tower :: drawUpperBase()
     shapes.drawCurvedRoof(24.138,-atan(21.136/11.660),-2*atan(11.660/21.136),8);
 
 /// roof building stops here ///////////////////////////
+
+
+/// railings of upper base ////////////////////////////
+
+    glPushMatrix();
+    {
+
+        //glTranslatef(.5,2.4,-1.0);
+        glTranslatef(0,3,-1.0);
+        //shapes.drawHalfCircle(13.8);
+        glRotatef(4,0,0,1);
+        glColor3f(0,0,0);
+        shapes.drawRoundPipe(13.8,0.424,190,50);
+    }
+    glPopMatrix();
+    double pnts6[][2]={
+        {x[0]-railingRadius,y[0]-railingRadius}
+        ,{x[1]-railingRadius*1.5,y[1]}
+        ,{x[2]-railingRadius,y[2]}
+        ,{x[3]-railingRadius,y[3]+railingRadius}
+        ,{x[4]-railingRadius,y[4]+railingRadius}
+    };
+
+    glColor3f(0,0,0);
+
+    /// vertical railings
+    for(int i=0;i<4;i++)
+    {
+        shapes.drawVertRailing(pnts6[i][0],pnts6[i][1],0,railingRadius,railingHeight);
+        shapes.drawVertRailing(-pnts6[i][0],pnts6[i][1],0,railingRadius,railingHeight);
+    }
+    int segments=10;
+    double railGap=pnts6[0][0]*2/segments;
+    double segX=railGap;
+    double segY=0.0;
+
+    /// intermediate railings start ////////////////////////////////////
+    for(int i=1;i<segments;i++)
+    {
+        shapes.drawVertRailing(-pnts6[0][0]+i*segX,pnts6[0][1],0,
+                               railingRadius,railingHeight);
+    }
+    /// pair ////////////////////////////////////////////////////////////
+    for(int i=0;i<3;i++)
+    {
+        double ang;
+        int sign = 1;
+        ang = atan((pnts6[i+1][1]-pnts6[i][1])/(pnts6[i+1][0]-pnts6[i][0]));
+        segX = railGap*cos(ang);
+        segY = railGap*sin(ang);
+        //printf("ang=%lf,segx=%lf,segy=%lf\n",ang,segX,segY);
+        segments = (pnts6[i+1][0]-pnts6[i][0])/segX;
+        if(segments<0)
+        {
+            segments=-segments;
+            sign = -1;
+        }
+        //printf("segment %d\n",segments);
+        for(int j=1;j<segments;j++)
+        {
+            shapes.drawVertRailing(pnts6[i][0]+sign*j*segX,
+                                   pnts6[i][1]+sign*j*segY,0,
+                                   railingRadius,railingHeight);
+        }
+    }
+    for(int i=0;i<3;i++)
+    {
+        double ang;
+        int sign = -1;
+        ang = atan((pnts6[i+1][1]-pnts6[i][1])/(pnts6[i+1][0]-pnts6[i][0]));
+        segX = railGap*cos(ang);
+        segY = railGap*sin(ang);
+        //printf("ang=%lf,segx=%lf,segy=%lf\n",ang,segX,segY);
+        segments = (pnts6[i+1][0]-pnts6[i][0])/segX;
+        if(segments<0)
+        {
+            segments=-segments;
+            sign = 1;
+        }
+        //printf("segment %d\n",segments);
+        for(int j=1;j<segments;j++)
+        {
+            shapes.drawVertRailing(-pnts6[i][0]+sign*j*segX,
+                                   pnts6[i][1]-sign*j*segY,0,
+                                   railingRadius,railingHeight);
+        }
+    }
+    /// pair end //////////////////////////////////////////////////////
+    /// intermediate railings end here /////////////////////////////////
+    /// horizontal railings start //////////////////////////////////////
+    glPushMatrix();
+    {
+        glTranslatef(0,0,railingHeight);
+        for(int i=0;i<4;i++)
+        {
+                shapes.drawHorzRailing(pnts6[i][0],pnts6[i][1],
+                                   pnts6[i+1][0],pnts6[i+1][1],
+                                   railingRadius);
+        }
+        for(int i=0;i<4;i++)
+        {
+                shapes.drawHorzRailing(-pnts6[i][0],pnts6[i][1],
+                                   -pnts6[i+1][0],pnts6[i+1][1],
+                                   railingRadius);
+        }
+        shapes.drawHorzRailing(pnts6[0][0],pnts6[0][1],
+                                   -pnts6[0][0],pnts6[0][1],
+                                   railingRadius);
+    }
+    glPopMatrix();
+/// railings end here //////////////////////////////////////////////
 }
 
 void Tower :: drawSingleBeam()

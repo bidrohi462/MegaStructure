@@ -25,6 +25,9 @@ class Shapes
         void drawArchShapeOld(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
         void drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness, bool beam);
         void drawRoundedBeam(double radius, double angle, int slices);
+        void drawVertRailing(double x,double y,double z,double r,double h);
+        void drawHorzRailing(double x1,double y1,double x2,double y2,double r);
+        void drawRoundPipe(double radius,double thickness,double angle, int slices);
 };
 
 void Shapes :: drawsphere(float radius)
@@ -750,6 +753,199 @@ void Shapes::drawRoundedBeam(double radius, double angle, int slices) {
 		glPopMatrix();
 	}
 	glPopMatrix();
+}
+void Shapes :: drawVertRailing(double x,double y,double z,double r,double h)
+{
+    GLUquadricObj *quadratic;
+    quadratic = gluNewQuadric();
+    glPushMatrix();
+    {
+        glTranslatef(x,y,z);
+        gluCylinder(quadratic,r,r,h,8,1);
+    }
+    glPopMatrix();
+}
+void Shapes :: drawHorzRailing(double x1,double y1,double x2,double y2,double r)
+{
+    Vector3 a(x1,y1,0), b(x2,y2,0); //(the two points you want to draw between)
+
+    // This is the default direction for the cylinders to face in OpenGL
+    Vector3 z(0,0,1);
+    // Get diff between two points you want cylinder along
+    Vector3 p(a.x-b.x,a.y-b.y,a.z-b.z);
+    // Get CROSS product (the axis of rotation)
+    Vector3 t = z.cross(p);
+
+    // Get angle. LENGTH is magnitude of the vector
+    double angle = 180 / PI * acos (z.dot(p) / p.getMagnitude());
+
+    glPushMatrix();
+    {
+        glTranslated(b.x,b.y,b.z);
+        glRotated(angle,t.x,t.y,t.z);
+
+        GLUquadricObj *quadratic;
+        quadratic = gluNewQuadric();
+        gluQuadricOrientation(quadratic,GLU_OUTSIDE);
+        gluCylinder(quadratic, r,r, p.getMagnitude(), 8, 1);
+    }
+    glPopMatrix();
+}
+
+void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int slices)
+{
+    double angle_inc=angle/(double)slices;
+	double slice_size=M_PI*radius/180*angle_inc;
+
+
+	glPushMatrix();
+	{
+        //glTranslatef(0,0,1);
+        //glColor3f(0,1,0);
+        //drawHalfCircle(10);
+
+		//glRotatef((180.0-angle)/2, 0, 0, -1);
+		//glTranslatef(1, 0, 0);
+		//glRotatef(12.0, 0, 0, -1);
+		glTranslatef(-radius+thickness*2, 0, 0);
+		glRotatef(270, 1, 0, 0);
+		glPushMatrix();
+		{
+			for(int i=0; i<slices; i++) {
+				drawCylinder(thickness, slice_size);
+				glTranslatef(-1.0, 0, slice_size);
+				glRotatef(angle_inc, 0, 1, 0);
+				glTranslatef(1.0, 0, 0);
+			}
+		}
+		glPopMatrix();
+		int lines = 3;
+
+	}
+	glPopMatrix();
+
+	glPushMatrix();
+	{
+	    double lineHalf=radius-6;
+        double quadWidth = 0.25;
+        double trns[]={10.5,-2.5,-2.5,-4.5,0,0,0};
+        double lineDel[]={0,2.8,1.4,0.7,0,0,0};
+        glRotatef(-4,0,0,1);
+
+        glTranslatef(-.3,0,0);
+
+        glColor3f(1,1,0);
+        for(int i=0;i<3;i++)
+        {
+            lineHalf+=lineDel[i];
+            glTranslatef(0,trns[i],0);
+            glColor3f(1,1,0);
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(-lineHalf,0,-quadWidth);
+                glVertex3f(-lineHalf,0,quadWidth);
+                glVertex3f(lineHalf,0,quadWidth);
+                glVertex3f(lineHalf,0,-quadWidth);
+            }
+            glEnd();
+            glColor3f(0.5,0.5,0.5);
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(-lineHalf,quadWidth/2.0,quadWidth);
+                glVertex3f(-lineHalf,-quadWidth/2.0,quadWidth);
+                glVertex3f(lineHalf,-quadWidth/2.0,quadWidth);
+                glVertex3f(lineHalf,quadWidth/2.0,quadWidth);
+            }
+            glEnd();
+
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(-lineHalf,quadWidth/2.0,-quadWidth);
+                glVertex3f(-lineHalf,-quadWidth/2.0,-quadWidth);
+                glVertex3f(lineHalf,-quadWidth/2.0,-quadWidth);
+                glVertex3f(lineHalf,quadWidth/2.0,-quadWidth);
+            }
+            glEnd();
+
+        }
+
+        //int i=3;
+        lineHalf+=lineDel[3];
+        glTranslatef(0,trns[3],0);
+        glColor3f(1,1,0);
+        double a=7;
+        for(int i=0;i<2;i++)
+        {
+            lineHalf=-lineHalf;
+            for(int j=0;j<2;j++)
+            {
+                a=-a;
+                glColor3f(1,1,0);
+                glBegin(GL_QUADS);
+                {
+                    glVertex3f(lineHalf,0,-quadWidth);
+                    glVertex3f(lineHalf,0,quadWidth);
+                    glVertex3f(0,a,quadWidth);
+                    glVertex3f(0,a,-quadWidth);
+                }
+                glEnd();
+                glColor3f(0.5,0.5,0.5);
+                glBegin(GL_QUADS);
+                {
+                    glVertex3f(lineHalf,-quadWidth,-quadWidth);
+                    glVertex3f(lineHalf,quadWidth,-quadWidth);
+                    glVertex3f(0,a+quadWidth,-quadWidth);
+                    glVertex3f(0,a-quadWidth,-quadWidth);
+                }
+                glEnd();
+                glBegin(GL_QUADS);
+                {
+                    glVertex3f(lineHalf,-quadWidth,quadWidth);
+                    glVertex3f(lineHalf,quadWidth,quadWidth);
+                    glVertex3f(0,a+quadWidth,quadWidth);
+                    glVertex3f(0,a-quadWidth,quadWidth);
+                }
+                glEnd();
+            }
+        }
+        a = -2.78;
+        lineHalf=12;
+        for(int i=0;i<2;i++)
+        {
+            a=-a;
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(a-quadWidth,0,-quadWidth);
+                glVertex3f(a+quadWidth,0,-quadWidth);
+                glVertex3f(a+quadWidth,lineHalf,-quadWidth);
+                glVertex3f(a-quadWidth,lineHalf,-quadWidth);
+            }
+            glEnd();
+
+            glColor3f(0.5,0.5,0.5);
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(a,0,-quadWidth);
+                glVertex3f(a,lineHalf,-quadWidth);
+                glVertex3f(a,lineHalf,quadWidth);
+                glVertex3f(a,0,quadWidth);
+            }
+            glEnd();
+            glColor3f(0.5,0.5,0);
+
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(a-quadWidth,0,quadWidth);
+                glVertex3f(a+quadWidth,0,quadWidth);
+                glVertex3f(a+quadWidth,lineHalf,quadWidth);
+                glVertex3f(a-quadWidth,lineHalf,quadWidth);
+            }
+            glEnd();
+
+        }
+	}
+	glPopMatrix();
+
 }
 
 #endif // PRIMITIVES_H

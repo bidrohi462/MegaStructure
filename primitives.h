@@ -23,7 +23,8 @@ class Shapes
         void drawCurvedWall(float r, float start_angle, float arc_angle, int num_segments,double height);
         void drawCurvedRoof(float r, float start_angle, float arc_angle, int num_segments);
         void drawArchShapeOld(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
-        void drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness);
+        void drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness, bool beam);
+        void drawRoundedBeam(double radius, double angle, int slices);
 };
 
 void Shapes :: drawsphere(float radius)
@@ -91,7 +92,7 @@ void Shapes :: drawCylinder(float radius,float len)
 	{
 	    for(j=0;j<slices;j++)
 		{
-		   glColor3f(color,color,color);
+		   //glColor3f(color,color,color);
 			glBegin(GL_QUADS);{
 				glVertex3f(points[i][j].x,points[i][j].y,points[i][j].z);
 				glVertex3f(points[i][j+1].x,points[i][j+1].y,points[i][j+1].z);
@@ -442,7 +443,7 @@ void Shapes :: drawArchShapeOld(float inRadius, float outRadius, float start_ang
     }
 
 }
-void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness)
+void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle, float arc_angle, int num_segments, double thickness, bool beam=false)
 {
     float cx=0, cy=0;
     double innerShift=-2;
@@ -637,26 +638,73 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
             //glRotatef(14,0,0,1);
             double shiftX = 0;
             glColor3f(0,0.5,1.0);
-            glBegin(GL_LINE_LOOP);
+            glBegin(GL_POLYGON);
             {
-                glVertex3f(thickness/2.0+shiftX,xx,zz);
-                glVertex3f(-thickness/2.0+shiftX,xx,zz);
-                glVertex3f(-thickness/2.0,0,-minHeight+span);
-                glVertex3f(thickness/2.0,0,-minHeight+span);
+                glVertex3f(thickness/2.0+shiftX,xx,zz); // lr
+                glVertex3f(-thickness/2.0+shiftX,xx,zz); // ll
+                glVertex3f(-thickness/2.0,0,-minHeight+span); // ul
+                glVertex3f(thickness/2.0,0,-minHeight+span); // ur
             }
             glEnd();
 
             xx+=10;
             glBegin(GL_POLYGON);
             {
-                glVertex3f(thickness/2.0,xx,zz);
-                glVertex3f(-thickness/2.0,xx,zz);
-                glVertex3f(-thickness/2.0,0,-minHeight);
-                glVertex3f(thickness/2.0,0,-minHeight);
+                glVertex3f(thickness/2.0,xx,zz); // lr
+                glVertex3f(-thickness/2.0,xx,zz); // ll
+                glVertex3f(-thickness/2.0,0,-minHeight); // ul
+                glVertex3f(thickness/2.0,0,-minHeight); // ur
+            }
+            glEnd();
+
+            xx-=10;
+
+            glColor3f(0,1.0,0.5);
+            glBegin(GL_POLYGON);
+            {
+                glVertex3f(thickness/2.0+shiftX,xx,zz); // lr
+                glVertex3f(thickness/2.0,xx+10,zz); // lr
+                glVertex3f(thickness/2.0,0,-minHeight); // ur
+                glVertex3f(thickness/2.0,0,-minHeight+span); // ur
+            }
+            glEnd();
+
+            //xx+=10;
+            glBegin(GL_POLYGON);
+            {
+                glVertex3f(-thickness/2.0+shiftX,xx,zz); // ll
+                glVertex3f(-thickness/2.0,xx+10,zz); // ll
+                glVertex3f(-thickness/2.0,0,-minHeight); // ul
+                glVertex3f(-thickness/2.0,0,-minHeight+span); // ul
             }
             glEnd();
         }
         glPopMatrix();
+        if(beam) {
+			int count=5;
+			drawRoundedBeam(17, 78, 15);
+
+			double beam_radius=outRadius-2;
+			double diff=beam_radius-17;
+			double angle_inc=(arc_angle-M_PI/9)/12;
+
+			for(int i=0; i<5; i++) {
+				double angle=angle_inc*(i+1);
+				double br=beam_radius*cos(angle)-diff;
+				double trans=beam_radius*sin(angle);
+
+				glPushMatrix(); {
+					glTranslatef(0, 0, trans);
+					drawRoundedBeam(br, 80, 15);
+				}
+				glPopMatrix();
+				glPushMatrix(); {
+					glTranslatef(0, 0, -trans);
+					drawRoundedBeam(br, 80, 15);
+				}
+				glPopMatrix();
+			}
+        }
     }
     glPopMatrix();
     //glTranslatef(0,0,-72);
@@ -670,6 +718,38 @@ void Shapes :: drawArchShape(float inRadius, float outRadius, float start_angle,
         	printf("y-ytrans=%f,iny-ytras=%f\n",y-yTrans,inY-yTrans);
     }
 
+}
+
+void Shapes::drawRoundedBeam(double radius, double angle, int slices) {
+	double angle_inc=angle/(double)slices;
+	double slice_size=M_PI*radius/180*angle_inc;
+
+	glPushMatrix(); {
+		//glRotatef((180.0-angle)/2, 0, 0, -1);
+		glTranslatef(1, 0, 0);
+		glRotatef(12.0, 0, 0, -1);
+		glTranslatef(-radius, 0, 0);
+		glRotatef(90.0, -1, 0, 0);
+		glPushMatrix(); {
+			for(int i=0; i<slices; i++) {
+				drawCylinder(0.5, slice_size);
+				glTranslatef(-1.0, 0, slice_size);
+				glRotatef(angle_inc, 0, 1, 0);
+				glTranslatef(1.0, 0, 0);
+			}
+		}
+		glPopMatrix();
+		glPushMatrix(); {
+			glRotatef(90, 0, 1, 0);
+			drawCylinder(0.5, radius);
+			glTranslatef(0, 0, radius);
+			glRotatef(angle-6, 0, 1, 0);
+			glTranslatef(0, 0, -radius);
+			drawCylinder(0.5, radius);
+		}
+		glPopMatrix();
+	}
+	glPopMatrix();
 }
 
 #endif // PRIMITIVES_H

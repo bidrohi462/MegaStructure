@@ -21,8 +21,10 @@ class Tower
         void drawBeamDetails();
         void drawUpperConeHalf();
         void drawUpperCone();
-        void drawSingleArch(double thickness);
+        void drawSingleArch(double thickness, bool beam);
         void drawArch();
+        void drawRoundedBeam(double radius, double angle, int slices);
+        void drawBeams(int count);
 
     public:
         Tower();
@@ -41,10 +43,12 @@ Tower :: Tower()
 void Tower :: drawTower()
 {
     drawLowerBase();
-    drawUpperBase();
+	drawUpperBase();
     drawMajorBeams();
     drawUpperCone();
     drawArch();
+    //shapes.drawRoundedBeam(20.0, 120.0, 15);
+    drawBeams(12);
 }
 
 void Tower :: drawLowerBase()
@@ -604,7 +608,7 @@ void Tower :: drawUpperCone()
     gluCylinder(quadratic,0.1f,5.0f,10.0f,4,4);
     */
 }
-void Tower :: drawSingleArch(double thickness)
+void Tower :: drawSingleArch(double thickness, bool beam=false)
 {
     /// marker starts
     double arcStartHeight = 23;
@@ -654,7 +658,7 @@ void Tower :: drawSingleArch(double thickness)
         //shapes.drawArc(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10);
         //shapes.drawCurvedWall(radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
         //shapes.drawArchShape(radius-3,radius,(90-stAng)*PI/180.0,2*stAng*PI/180.0,10,thickness);
-        shapes.drawArchShape(radius-3,radius,(PI/2.0-stAng),2*stAng,12,thickness);
+        shapes.drawArchShape(radius-3,radius,(PI/2.0-stAng),2*stAng,12,thickness,beam);
 
 /// lower irregular part of the arch
 /*
@@ -688,11 +692,40 @@ void Tower :: drawArch()
     glPushMatrix();
     {
         glRotatef(-ang,0,0,1);
-        drawSingleArch(1);
+        drawSingleArch(1, true);
         glRotatef(2*ang,0,0,1);
-        //drawSingleArch(1);
+        drawSingleArch(1);
     }
     glPopMatrix();
+}
+
+void Tower::drawRoundedBeam(double radius, double angle, int slices) {
+	double angle_inc=angle/(double)slices;
+	double slice_size=M_PI*radius/180*angle_inc;
+
+	glPushMatrix(); {
+		glRotatef((180.0-angle)/2, 0, 0, -1);
+		glTranslatef(-radius, 0, 0);
+		glRotatef(90.0, -1, 0, 0);
+		glPushMatrix(); {
+			for(int i=0; i<slices; i++) {
+				shapes.drawCylinder(0.5, slice_size);
+				glTranslatef(-1.0, 0, slice_size);
+				glRotatef(angle_inc, 0, 1, 0);
+				glTranslatef(1.0, 0, 0);
+			}
+		}
+		glPopMatrix();
+	}
+	glPopMatrix();
+}
+
+void Tower::drawBeams(int count)
+{
+	//glTranslatef(0, 0, 45);
+	//glRotatef(5, 0, 0, -1);
+	//glTranslatef(10, 10, 0);
+	//drawRoundedBeam(6.0, 120.0, 15);
 }
 
 #endif // TOWER_H

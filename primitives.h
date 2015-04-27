@@ -834,12 +834,12 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
 
         glTranslatef(-.3,0,0);
 
-        glColor3f(1,1,0);
+        //glColor3f(1,1,0);
         for(int i=0;i<3;i++)
         {
             lineHalf+=lineDel[i];
             glTranslatef(0,trns[i],0);
-            glColor3f(1,1,0);
+            //glColor3f(1,1,0);
             glBegin(GL_QUADS);
             {
                 glVertex3f(-lineHalf,0,-quadWidth);
@@ -848,7 +848,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
                 glVertex3f(lineHalf,0,-quadWidth);
             }
             glEnd();
-            glColor3f(0.5,0.5,0.5);
+            //glColor3f(0.5,0.5,0.5);
             glBegin(GL_QUADS);
             {
                 glVertex3f(-lineHalf,quadWidth/2.0,quadWidth);
@@ -872,7 +872,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
         //int i=3;
         lineHalf+=lineDel[3];
         glTranslatef(0,trns[3],0);
-        glColor3f(1,1,0);
+        //glColor3f(1,1,0);
         double a=7;
         for(int i=0;i<2;i++)
         {
@@ -880,7 +880,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
             for(int j=0;j<2;j++)
             {
                 a=-a;
-                glColor3f(1,1,0);
+                //glColor3f(1,1,0);
                 glBegin(GL_QUADS);
                 {
                     glVertex3f(lineHalf,0,-quadWidth);
@@ -889,7 +889,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
                     glVertex3f(0,a,-quadWidth);
                 }
                 glEnd();
-                glColor3f(0.5,0.5,0.5);
+                //glColor3f(0.5,0.5,0.5);
                 glBegin(GL_QUADS);
                 {
                     glVertex3f(lineHalf,-quadWidth,-quadWidth);
@@ -922,7 +922,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
             }
             glEnd();
 
-            glColor3f(0.5,0.5,0.5);
+            //glColor3f(0.5,0.5,0.5);
             glBegin(GL_QUADS);
             {
                 glVertex3f(a,0,-quadWidth);
@@ -931,7 +931,7 @@ void Shapes :: drawRoundPipe(double radius,double thickness,double angle,int sli
                 glVertex3f(a,0,quadWidth);
             }
             glEnd();
-            glColor3f(0.5,0.5,0);
+            //glColor3f(0.5,0.5,0);
 
             glBegin(GL_QUADS);
             {

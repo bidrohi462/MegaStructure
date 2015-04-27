@@ -3,11 +3,13 @@
 
 #include <cmath>
 #include "primitives.h"
+#include "texture.h"
 
 class Tower
 {
     private:
         Shapes shapes;
+        Texture tr;
         double lowerBaseHeight;
         double lowerBaseRadius;
         double upperBaseHeight;
@@ -63,7 +65,7 @@ void Tower :: drawLowerBase()
     glColor3f(0.5,0.5,0.5);
     shapes.drawHalfCylinder(lowerBaseRadius,lowerBaseHeight);
     glPushMatrix();{
-        glColor3f(0,0,0.5);
+        glColor3f(0.7,0.7,0.7);
         double pnts1[][2]={
             {lowerBaseRadius,0}
             ,{lowerBaseRadius+19.169,-10.871}
@@ -89,13 +91,13 @@ void Tower :: drawLowerBase()
             ,{-lowerBaseRadius+4.456,-10}
         };
 
-        glColor3f(0,0,0.8);
+        glColor3f(0.8,0.8,0.8);
         shapes.drawWalls(2,pnts7,0.8);
 
         glColor3f(0.5,0.5,0.5);
         shapes.drawHalfCylinder(lowerBaseRadius-4.456,0.8);
 
-        glColor3f(0.8,0.8,0);
+        glColor3f(0.8,0.8,0.8);
         shapes.drawHalfCircle(lowerBaseRadius);
 /// lower layer irregular shapes //////////////////////////////////////////
 
@@ -131,7 +133,7 @@ void Tower :: drawLowerBase()
 /// circular railing //////////////////////////////////////////
         int lowRailCount = 30;
         double rotAng=180.0/lowRailCount;
-        glColor3f(0,0,0);
+        glColor3f(0.5,0.5,0.5);
 
         glPushMatrix();
         {
@@ -141,7 +143,7 @@ void Tower :: drawLowerBase()
                 glPushMatrix();
                 {
                     glTranslatef(lowerBaseRadius-4.6,0,0);
-                    glColor3f(0,0,0);
+                    glColor3f(0.5,0.5,0.5);
                     shapes.drawVertRailing(0,0,0,railingRadius,railingHeight+0.1);
                     glPushMatrix();
                     {
@@ -183,14 +185,11 @@ void Tower :: drawLowerBase()
         }
         glPopMatrix();
 
-        glColor3f(0,0.8,0);
+        glColor3f(0.8,0.8,0.8);
         shapes.drawHalfCircle(lowerBaseRadius-4.456);
-        /// right stair ////////////////////////////////
-
-        /// right stair end ////////////////////////////
 
 /// drawing irregular shaped portion in upper layer
-        //glColor3f(0,0,1.0);
+        //glColor3f(0.8,0.8,0.8);
         double pnts6[][2]={
             {lowerBaseRadius-4.456,0}
             ,{-lowerBaseRadius+4.456+1.369,-10}
@@ -271,7 +270,7 @@ void Tower :: drawUpperBase()
 {
     glTranslatef(2,-4.8,lowerBaseHeight+0.85);
     glRotatef(30,0,0,1);
-    glColor3f(0.5,1.0,1.0);
+    glColor3f(0.1,0.5,0.5);
     //draw half of the upper base
     double x[]={5.247,13.017,11.15,10.33,
                 7.753,6.835,5.804,11.660,0};
@@ -316,7 +315,7 @@ void Tower :: drawUpperBase()
 /// roof building starts here //////////////////////////
 
     glTranslatef(0,0,upperBaseHeight);
-    glColor3f(1.0,0,0);
+    glColor3f(0.7,0.7,0.7);
 
     double pnts1[][2]={
 
@@ -378,12 +377,11 @@ void Tower :: drawUpperBase()
 
     glPushMatrix();
     {
-
         //glTranslatef(.5,2.4,-1.0);
         glTranslatef(0,3,-1.0);
         //shapes.drawHalfCircle(13.8);
         glRotatef(4,0,0,1);
-        glColor3f(0,0,0);
+        glColor3f(1,1,1);
         shapes.drawRoundPipe(13.8,0.424,190,50);
     }
     glPopMatrix();
@@ -395,7 +393,7 @@ void Tower :: drawUpperBase()
         ,{x[4]-railingRadius,y[4]+railingRadius}
     };
 
-    glColor3f(0,0,0);
+    glColor3f(0.5,0.5,0.5);
 
     /// vertical railings
     for(int i=0;i<4;i++)
